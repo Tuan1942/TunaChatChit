@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TunaChatChit.Context;
 
@@ -11,9 +12,11 @@ using TunaChatChit.Context;
 namespace TunaChatChit.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    partial class ChatContextModelSnapshot : ModelSnapshot
+    [Migration("20240719090032_Add 2 default role")]
+    partial class Add2defaultrole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,29 +44,6 @@ namespace TunaChatChit.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("TunaChatChit.Context.AccountRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AccountRoles");
                 });
 
             modelBuilder.Entity("TunaChatChit.Context.Message", b =>
@@ -182,23 +162,27 @@ namespace TunaChatChit.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TunaChatChit.Context.AccountRole", b =>
+            modelBuilder.Entity("TunaChatChit.Context.UserRole", b =>
                 {
-                    b.HasOne("TunaChatChit.Context.Role", "Role")
-                        .WithMany("AccountRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.HasOne("TunaChatChit.Context.Account", "Account")
-                        .WithMany("AccountRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Navigation("Account");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
-                    b.Navigation("Role");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("TunaChatChit.Context.Message", b =>
@@ -223,14 +207,33 @@ namespace TunaChatChit.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("TunaChatChit.Context.Account", b =>
+            modelBuilder.Entity("TunaChatChit.Context.UserRole", b =>
                 {
-                    b.Navigation("AccountRoles");
+                    b.HasOne("TunaChatChit.Context.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TunaChatChit.Context.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TunaChatChit.Context.Role", b =>
                 {
-                    b.Navigation("AccountRoles");
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("TunaChatChit.Context.User", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

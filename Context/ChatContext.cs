@@ -12,7 +12,7 @@ namespace TunaChatChit.Context
         public DbSet<Account> Accounts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<AccountRole> AccountRoles { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<MessageContent> MessageContents { get; set; }
 
@@ -30,15 +30,19 @@ namespace TunaChatChit.Context
                 .WithOne()
                 .HasForeignKey<Message>(m => m.Id);
 
-            modelBuilder.Entity<UserRole>()
-                .HasOne(ur => ur.User)
-                .WithMany(u => u.UserRoles)
+            modelBuilder.Entity<AccountRole>()
+                .HasOne(ar => ar.Account)
+                .WithMany(u => u.AccountRoles)
                 .HasForeignKey(ur => ur.UserId);
 
-            modelBuilder.Entity<UserRole>()
+            modelBuilder.Entity<AccountRole>()
                 .HasOne(ur => ur.Role)
-                .WithMany(r => r.UserRoles)
+                .WithMany(r => r.AccountRoles)
                 .HasForeignKey(ur => ur.RoleId);
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, RoleName = "Admin" },
+                new Role { Id = 2, RoleName = "User" }
+                );
         }
     }
 
@@ -48,6 +52,7 @@ namespace TunaChatChit.Context
         public int Id { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
+        public ICollection<AccountRole> AccountRoles { get; set; }
     }
 
     public class User
@@ -63,7 +68,6 @@ namespace TunaChatChit.Context
         public string? Province { get; set; }
 
         public Account Account { get; set; }
-        public ICollection<UserRole> UserRoles { get; set; }
     }
 
     public class Role
@@ -71,14 +75,14 @@ namespace TunaChatChit.Context
         public int Id { get; set; }
         public string RoleName { get; set; }
 
-        public ICollection<UserRole> UserRoles { get; set; }
+        public ICollection<AccountRole> AccountRoles { get; set; }
     }
 
-    public class UserRole
+    public class AccountRole
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
+        public Account Account { get; set; }
 
         public int RoleId { get; set; }
         public Role Role { get; set; }
