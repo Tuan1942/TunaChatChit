@@ -25,10 +25,10 @@ namespace TunaChatChit.Context
                 .WithOne()
                 .HasForeignKey<User>(u => u.AccountId);
 
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.MessageContent)
+            modelBuilder.Entity<MessageContent>()
+                .HasOne(m => m.Message)
                 .WithOne()
-                .HasForeignKey<Message>(m => m.Id);
+                .HasForeignKey<MessageContent>(m => m.MessageId);
 
             modelBuilder.Entity<AccountRole>()
                 .HasOne(ar => ar.Account)
@@ -95,17 +95,17 @@ namespace TunaChatChit.Context
         public int Id { get; set; }
         public int SendId { get; set; }
         public int ReceiveId { get; set; }
-        public MType Type { get; set; }
         public DateTime SentTime { get; set; }
-
-        public MessageContent MessageContent { get; set; }
     }
 
     public class MessageContent
     {
         public int Id { get; set; }
-        public string Type { get; set; }
+        public int MessageId { get; set; }
+        public MType Type { get; set; }
         public string Content { get; set; }
+
+        public Message Message { get; set; }
     }
     #endregion
 }

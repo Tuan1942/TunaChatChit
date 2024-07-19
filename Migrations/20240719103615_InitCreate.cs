@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace TunaChatChit.Migrations
 {
     /// <inheritdoc />
@@ -26,17 +28,18 @@ namespace TunaChatChit.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MessageContents",
+                name: "Messages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    SendId = table.Column<int>(type: "int", nullable: false),
+                    ReceiveId = table.Column<int>(type: "int", nullable: false),
+                    SentTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MessageContents", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,28 +82,28 @@ namespace TunaChatChit.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
+                name: "MessageContents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    SendId = table.Column<int>(type: "int", nullable: false),
-                    ReceiveId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MessageId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SentTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.PrimaryKey("PK_MessageContents", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_MessageContents_Id",
-                        column: x => x.Id,
-                        principalTable: "MessageContents",
+                        name: "FK_MessageContents_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRoles",
+                name: "AccountRoles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -110,30 +113,45 @@ namespace TunaChatChit.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRoles", x => x.Id);
+                    table.PrimaryKey("PK_AccountRoles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserRoles_Roles_RoleId",
+                        name: "FK_AccountRoles_Accounts_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AccountRoles_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserRoles_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Admin" },
+                    { 2, "User" }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_RoleId",
-                table: "UserRoles",
+                name: "IX_AccountRoles_RoleId",
+                table: "AccountRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_UserId",
-                table: "UserRoles",
+                name: "IX_AccountRoles_UserId",
+                table: "AccountRoles",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessageContents_MessageId",
+                table: "MessageContents",
+                column: "MessageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_AccountId",
@@ -146,19 +164,19 @@ namespace TunaChatChit.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Messages");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles");
+                name: "AccountRoles");
 
             migrationBuilder.DropTable(
                 name: "MessageContents");
 
             migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Accounts");

@@ -69,7 +69,10 @@ namespace TunaChatChit.Migrations
             modelBuilder.Entity("TunaChatChit.Context.Message", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ReceiveId")
                         .HasColumnType("int");
@@ -79,9 +82,6 @@ namespace TunaChatChit.Migrations
 
                     b.Property<DateTime>("SentTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -100,11 +100,16 @@ namespace TunaChatChit.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("MessageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MessageId")
+                        .IsUnique();
 
                     b.ToTable("MessageContents");
                 });
@@ -201,15 +206,15 @@ namespace TunaChatChit.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TunaChatChit.Context.Message", b =>
+            modelBuilder.Entity("TunaChatChit.Context.MessageContent", b =>
                 {
-                    b.HasOne("TunaChatChit.Context.MessageContent", "MessageContent")
+                    b.HasOne("TunaChatChit.Context.Message", "Message")
                         .WithOne()
-                        .HasForeignKey("TunaChatChit.Context.Message", "Id")
+                        .HasForeignKey("TunaChatChit.Context.MessageContent", "MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("MessageContent");
+                    b.Navigation("Message");
                 });
 
             modelBuilder.Entity("TunaChatChit.Context.User", b =>
